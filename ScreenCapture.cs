@@ -31,7 +31,7 @@ internal static class ScreenCapture
         try
         {
             if (!BitBlt(mem, 0, 0, w, h, screen, x, y, SRCCOPY | CAPTUREBLT))
-                throw new InvalidOperationException("BitBlt не удался");
+                throw new InvalidOperationException("BitBlt failed");
 
             SelectObject(mem, old);
             old = IntPtr.Zero;

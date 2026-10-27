@@ -9,26 +9,12 @@ namespace SSSPen;
 
 public sealed class SettingsWindow : Window
 {
-    private static readonly (string Key, string Label)[] HotkeyRows =
+    private static readonly string[] HotkeyRows =
     {
-        ("ToggleDraw", "Рисовать вкл/выкл (перо)"),
-        ("ToggleToolbar", "Показать/скрыть панель"),
-        ("ScreenshotFull", "Скриншот всего экрана"),
-        ("ScreenshotRegion", "Скриншот области"),
-        ("Line", "Быстрая линия"),
-        ("Rect", "Быстрый прямоугольник"),
-        ("Ellipse", "Быстрый эллипс"),
-        ("Arrow", "Быстрая стрелка"),
-        ("Eraser", "Ластик (вкл)"),
-        ("Undo", "Отменить последнее"),
-        ("Clear", "Очистить всё"),
-        ("Color1", "Цвет 1"),
-        ("Color2", "Цвет 2"),
-        ("Color3", "Цвет 3"),
-        ("Color4", "Цвет 4"),
-        ("Color5", "Цвет 5"),
-        ("Color6", "Цвет 6"),
-        ("OpenSettings", "Открыть настройки"),
+        "ToggleDraw", "ToggleToolbar", "ScreenshotFull", "ScreenshotRegion",
+        "Line", "Rect", "Ellipse", "Arrow", "Eraser", "Undo", "Clear",
+        "Color1", "Color2", "Color3", "Color4", "Color5", "Color6",
+        "OpenSettings",
     };
 
     private readonly AppSettings _settings;
@@ -39,6 +25,8 @@ public sealed class SettingsWindow : Window
     private readonly Slider _thickness;
     private readonly Slider _toolbarScale;
     private readonly Slider _delay;
+    private readonly CheckBox _startup;
+    private readonly ComboBox _lang;
     private readonly TextBox _fullFolder;
     private readonly TextBox _regionFolder;
 
@@ -48,7 +36,7 @@ public sealed class SettingsWindow : Window
         _onSaved = onSaved;
         _palette = new List<string>(settings.Palette);
 
-        Title = "SSS Pen — настройки";
+        Title = Loc.T("s.title");
         Width = 500;
         MaxHeight = 780;
         SizeToContent = SizeToContent.Height;
@@ -59,17 +47,17 @@ public sealed class SettingsWindow : Window
         var root = new StackPanel { Margin = new Thickness(16) };
 
         // --- горячие клавиши ---
-        root.Children.Add(Header("Горячие клавиши (кликни в поле и нажми комбинацию; Del — очистить)"));
+        root.Children.Add(Header(Loc.T("s.hotkeys")));
         var grid = new Grid { Margin = new Thickness(0, 6, 0, 12) };
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(220) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
         int row = 0;
-        foreach (var (key, label) in HotkeyRows)
+        foreach (string key in HotkeyRows)
         {
             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-            var tb1 = new TextBlock { Text = label, Margin = new Thickness(0, 4, 8, 4), VerticalAlignment = VerticalAlignment.Center };
+            var tb1 = new TextBlock { Text = Loc.T("hk." + key), Margin = new Thickness(0, 4, 8, 4), VerticalAlignment = VerticalAlignment.Center };
             Grid.SetRow(tb1, row);
             Grid.SetColumn(tb1, 0);
             grid.Children.Add(tb1);
@@ -86,12 +74,12 @@ public sealed class SettingsWindow : Window
         root.Children.Add(grid);
 
         // --- папки скриншотов ---
-        root.Children.Add(Header("Куда сохранять скриншоты"));
-        _fullFolder = FolderRow(root, "Весь экран:", settings.FullFolder);
-        _regionFolder = FolderRow(root, "Область (как в Lightshot):", settings.RegionFolder);
+        root.Children.Add(Header(Loc.T("s.folders")));
+        _fullFolder = FolderRow(root, Loc.T("s.fullFolder"), settings.FullFolder);
+        _regionFolder = FolderRow(root, Loc.T("s.regionFolder"), settings.RegionFolder);
 
         // --- палитра ---
-        var palHeader = Header("Цвета (клик по цвету — изменить)");
+        var palHeader = Header(Loc.T("s.colors"));
         palHeader.Margin = new Thickness(0, 14, 0, 0);
         root.Children.Add(palHeader);
         var wrap = new WrapPanel { Margin = new Thickness(0, 6, 0, 12) };
@@ -107,7 +95,7 @@ public sealed class SettingsWindow : Window
         root.Children.Add(wrap);
 
         // --- толщина ---
-        root.Children.Add(Header("Толщина линии"));
+        root.Children.Add(Header(Loc.T("s.thickness")));
         _thickness = new Slider
         {
             Minimum = 1, Maximum = 30, Value = settings.Thickness,
@@ -117,7 +105,7 @@ public sealed class SettingsWindow : Window
         root.Children.Add(_thickness);
 
         // --- размер панели ---
-        root.Children.Add(Header("Размер панели (0.6 – 2.0)"));
+        root.Children.Add(Header(Loc.T("s.scale")));
         _toolbarScale = new Slider
         {
             Minimum = 0.6, Maximum = 2.0, Value = settings.ToolbarScale,
@@ -129,7 +117,7 @@ public sealed class SettingsWindow : Window
         root.Children.Add(_toolbarScale);
 
         // --- задержка скриншота ---
-        root.Children.Add(Header("Задержка скриншота, мс (только при открытой панели; со скрытой панелью скриншот мгновенный)"));
+        root.Children.Add(Header(Loc.T("s.delay")));
         _delay = new Slider
         {
             Minimum = 0, Maximum = 500, Value = settings.ScreenshotDelayMs,
@@ -140,10 +128,27 @@ public sealed class SettingsWindow : Window
         };
         root.Children.Add(_delay);
 
+        // --- запуск с Windows ---
+        _startup = new CheckBox
+        {
+            Content = Loc.T("s.startup"),
+            IsChecked = settings.RunAtStartup,
+            Margin = new Thickness(0, 0, 0, 12),
+        };
+        root.Children.Add(_startup);
+
+        // --- язык ---
+        root.Children.Add(Header(Loc.T("s.language")));
+        _lang = new ComboBox { Margin = new Thickness(0, 6, 0, 14) };
+        _lang.Items.Add("English");
+        _lang.Items.Add("Русский");
+        _lang.SelectedIndex = Loc.Lang == "ru" ? 1 : 0;
+        root.Children.Add(_lang);
+
         // --- кнопки ---
         var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
-        var save = new Button { Content = "Сохранить", Width = 100, Padding = new Thickness(6), Margin = new Thickness(0, 0, 8, 0), IsDefault = true };
-        var cancel = new Button { Content = "Отмена", Width = 100, Padding = new Thickness(6), IsCancel = true };
+        var save = new Button { Content = Loc.T("s.save"), Width = 100, Padding = new Thickness(6), Margin = new Thickness(0, 0, 8, 0), IsDefault = true };
+        var cancel = new Button { Content = Loc.T("s.cancel"), Width = 100, Padding = new Thickness(6), IsCancel = true };
         save.Click += (_, _) => Save();
         buttons.Children.Add(save);
         buttons.Children.Add(cancel);
@@ -157,10 +162,10 @@ public sealed class SettingsWindow : Window
 
     private static TextBox FolderRow(StackPanel parent, string label, string value)
     {
-        parent.Children.Add(new TextBlock { Text = label, Margin = new Thickness(0, 6, 0, 2) });
+        parent.Children.Add(new TextBlock { Text = Loc.T("hk." + key), Margin = new Thickness(0, 6, 0, 2) });
 
         var dock = new DockPanel();
-        var btn = new Button { Content = "Обзор…", Padding = new Thickness(8, 2, 8, 2), Margin = new Thickness(6, 0, 0, 0) };
+        var btn = new Button { Content = Loc.T("s.browse"), Padding = new Thickness(8, 2, 8, 2), Margin = new Thickness(6, 0, 0, 0) };
         DockPanel.SetDock(btn, Dock.Right);
         var tb = new TextBox { Text = value, Padding = new Thickness(4) };
         btn.Click += (_, _) =>
@@ -247,6 +252,8 @@ public sealed class SettingsWindow : Window
         _settings.Thickness = _thickness.Value;
         _settings.ToolbarScale = Math.Round(_toolbarScale.Value, 2);
         _settings.ScreenshotDelayMs = (int)Math.Round(_delay.Value);
+        _settings.RunAtStartup = _startup.IsChecked == true;
+        _settings.Language = _lang.SelectedIndex == 1 ? "ru" : "en";
         _settings.Save();
         _onSaved();
         Close();

@@ -15,6 +15,12 @@ public sealed class AppSettings
     // панель
     public double ToolbarScale { get; set; } = 1.0;
 
+    // язык интерфейса: "en" (по умолчанию) или "ru"
+    public string Language { get; set; } = "en";
+
+    // автозапуск вместе с Windows
+    public bool RunAtStartup { get; set; } = false;
+
     // задержка скриншота (мс), только когда панель открыта (ей нужно время скрыться); при скрытой панели задержка = 0
     public int ScreenshotDelayMs { get; set; } = 150;
     public double? ToolbarLeft { get; set; }
@@ -136,6 +142,7 @@ public sealed class AppSettings
                             s.Hotkeys[kv.Key] = kv.Value;
 
                     MigrateOldPalette(s);
+                    if (s.Language != "en" && s.Language != "ru") s.Language = "en";
 
                     var def = DefaultPalette();
                     while (s.Palette.Count < 6)

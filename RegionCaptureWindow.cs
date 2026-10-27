@@ -145,12 +145,12 @@ public sealed class RegionCaptureWindow : Window
             panel.Children.Add(b);
         }
 
-        AddTool(Tool.Pen, Icons.Pencil, true, "Карандаш");
-        AddTool(Tool.Line, Icons.Line, false, "Линия");
-        AddTool(Tool.Arrow, Icons.Arrow, false, "Стрелка");
-        AddTool(Tool.Rect, Icons.Rect, false, "Прямоугольник");
-        AddTool(Tool.Ellipse, Icons.Ellipse, false, "Эллипс");
-        AddTool(Tool.Eraser, Icons.Eraser, false, "Ластик");
+        AddTool(Tool.Pen, Icons.Pencil, true, Loc.T("tool.pen"));
+        AddTool(Tool.Line, Icons.Line, false, Loc.T("tool.line"));
+        AddTool(Tool.Arrow, Icons.Arrow, false, Loc.T("tool.arrow"));
+        AddTool(Tool.Rect, Icons.Rect, false, Loc.T("tool.rect"));
+        AddTool(Tool.Ellipse, Icons.Ellipse, false, Loc.T("tool.ellipse"));
+        AddTool(Tool.Eraser, Icons.Eraser, false, Loc.T("tool.eraser"));
         panel.Children.Add(VSep());
 
         foreach (string hex in _s.Palette)
@@ -182,11 +182,11 @@ public sealed class RegionCaptureWindow : Window
         }
         panel.Children.Add(VSep());
 
-        panel.Children.Add(UiKit.Button(Icons.Undo, false, "Отменить (Ctrl+Z)", Undo, 18, 30));
+        panel.Children.Add(UiKit.Button(Icons.Undo, false, Loc.T("ed.undo"), Undo, 18, 30));
         panel.Children.Add(VSep());
-        panel.Children.Add(UiKit.Button(Icons.Save, false, "Сохранить (Ctrl+S)", SaveAndClose, 18, 30));
-        panel.Children.Add(UiKit.Button(Icons.Copy, false, "Копировать (Ctrl+C)", CopyAndClose, 18, 30));
-        panel.Children.Add(UiKit.Button(Icons.Close, false, "Закрыть (Esc)", Close, 18, 30));
+        panel.Children.Add(UiKit.Button(Icons.Save, false, Loc.T("ed.save"), SaveAndClose, 18, 30));
+        panel.Children.Add(UiKit.Button(Icons.Copy, false, Loc.T("ed.copy"), CopyAndClose, 18, 30));
+        panel.Children.Add(UiKit.Button(Icons.Close, false, Loc.T("ed.close"), Close, 18, 30));
 
         _toolbar = new Border
         {
@@ -551,11 +551,11 @@ public sealed class RegionCaptureWindow : Window
         {
             string folder = string.IsNullOrWhiteSpace(_s.RegionFolder) ? AppSettings.DefaultRegionFolder() : _s.RegionFolder;
             string path = ScreenCapture.SavePng(RenderResult(), folder, "Region");
-            _notify("Скриншот сохранён", path);
+            _notify(Loc.T("n.saved"), path);
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Не удалось сохранить: " + ex.Message, "SSS Pen");
+            MessageBox.Show(Loc.T("err.save") + " " + ex.Message, "SSS Pen");
             return;
         }
         Close();
@@ -575,7 +575,7 @@ public sealed class RegionCaptureWindow : Window
             }
             catch { }
         }
-        _notify("Скопировано", "Область скопирована в буфер обмена");
+        _notify(Loc.T("n.copied"), Loc.T("n.copiedText"));
         Close();
     }
 

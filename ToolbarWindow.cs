@@ -130,7 +130,7 @@ public sealed class ToolbarWindow : Window
             Height = 16,
             Background = Brushes.Transparent,
             Cursor = Cursors.SizeAll,
-            ToolTip = "Перетащить",
+            ToolTip = Loc.T("tb.drag"),
             Child = new System.Windows.Shapes.Rectangle
             {
                 Width = 22, Height = 3, RadiusX = 1.5, RadiusY = 1.5,
@@ -149,14 +149,14 @@ public sealed class ToolbarWindow : Window
         stack.Children.Add(grip);
 
         // инструменты (постоянные)
-        _cursorBtn = UiKit.Button(Icons.Cursor, true, "Курсор (мышь)", () => _overlay.SetDrawMode(false));
+        _cursorBtn = UiKit.Button(Icons.Cursor, true, Loc.T("tb.cursor"), () => _overlay.SetDrawMode(false));
         stack.Children.Add(_cursorBtn);
-        AddTool(stack, Tool.Pen, Icons.Pencil, true, "Карандаш");
-        AddTool(stack, Tool.Line, Icons.Line, false, "Линия");
-        AddTool(stack, Tool.Arrow, Icons.Arrow, false, "Стрелка");
-        AddTool(stack, Tool.Rect, Icons.Rect, false, "Прямоугольник");
-        AddTool(stack, Tool.Ellipse, Icons.Ellipse, false, "Эллипс");
-        AddTool(stack, Tool.Eraser, Icons.Eraser, false, "Ластик");
+        AddTool(stack, Tool.Pen, Icons.Pencil, true, Loc.T("tool.pen"));
+        AddTool(stack, Tool.Line, Icons.Line, false, Loc.T("tool.line"));
+        AddTool(stack, Tool.Arrow, Icons.Arrow, false, Loc.T("tool.arrow"));
+        AddTool(stack, Tool.Rect, Icons.Rect, false, Loc.T("tool.rect"));
+        AddTool(stack, Tool.Ellipse, Icons.Ellipse, false, Loc.T("tool.ellipse"));
+        AddTool(stack, Tool.Eraser, Icons.Eraser, false, Loc.T("tool.eraser"));
         stack.Children.Add(Separator());
 
         // цвета
@@ -196,7 +196,7 @@ public sealed class ToolbarWindow : Window
             Minimum = 1, Maximum = 30, Value = _s.Thickness,
             Width = 32, Margin = new Thickness(0, 6, 0, 4),
             HorizontalAlignment = HorizontalAlignment.Center,
-            ToolTip = "Толщина",
+            ToolTip = Loc.T("tb.thickness"),
         };
         slider.ValueChanged += (_, e) => _s.Thickness = Math.Round(e.NewValue);
         slider.PreviewMouseLeftButtonUp += (_, _) => _s.Save();
@@ -204,17 +204,17 @@ public sealed class ToolbarWindow : Window
         stack.Children.Add(Separator());
 
         // действия
-        stack.Children.Add(UiKit.Button(Icons.Undo, false, "Отменить", _overlay.Undo));
-        stack.Children.Add(UiKit.Button(Icons.Trash, false, "Очистить всё", _overlay.Clear));
+        stack.Children.Add(UiKit.Button(Icons.Undo, false, Loc.T("tb.undo"), _overlay.Undo));
+        stack.Children.Add(UiKit.Button(Icons.Trash, false, Loc.T("tb.clear"), _overlay.Clear));
         stack.Children.Add(Separator());
 
         // скриншоты
-        stack.Children.Add(UiKit.Button(Icons.ScreenFull, false, "Скриншот всего экрана", _fullShot));
-        stack.Children.Add(UiKit.Button(Icons.ScreenRegion, false, "Скриншот области", _regionShot));
+        stack.Children.Add(UiKit.Button(Icons.ScreenFull, false, Loc.T("tb.shotFull"), _fullShot));
+        stack.Children.Add(UiKit.Button(Icons.ScreenRegion, false, Loc.T("tb.shotRegion"), _regionShot));
         stack.Children.Add(Separator());
 
-        stack.Children.Add(UiKit.Button(Icons.Settings, false, "Настройки", _openSettings));
-        stack.Children.Add(UiKit.Button(Icons.Close, false, "Скрыть панель", _hide));
+        stack.Children.Add(UiKit.Button(Icons.Settings, false, Loc.T("tb.settings"), _openSettings));
+        stack.Children.Add(UiKit.Button(Icons.Close, false, Loc.T("tb.hide"), _hide));
 
         return stack;
     }

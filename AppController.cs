@@ -18,6 +18,8 @@ public sealed class AppController
     public void Start()
     {
         _settings = AppSettings.Load();
+        Loc.Lang = _settings.Language;
+        if (_settings.RunAtStartup) Autostart.Apply(true);   // обновить путь к exe, если файл переместили
 
         _overlay = new OverlayWindow(_settings);
         _overlay.Show();
@@ -83,9 +85,9 @@ public sealed class AppController
         if (showErrors && failed.Count > 0)
         {
             MessageBox.Show(
-                "Не удалось занять эти сочетания (заняты другой программой или записаны неверно):\n\n" +
+                Loc.T("hk.fail") + "\n\n" +
                 string.Join("\n", failed) +
-                "\n\nИзмени их в настройках.",
+                "\n\n" + Loc.T("hk.failEnd"),
                 "SSS Pen", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
@@ -133,6 +135,13 @@ public sealed class AppController
 
     private void OnSettingsSaved()
     {
+        Loc.Lang = _settings.Language;
+        Autostart.Apply(_settings.RunAtStartup);
+
+        var oldMenu = _tray.ContextMenuStrip;
+        _tray.ContextMenuStrip = BuildTrayMenu();
+        oldMenu?.Dispose();
+
         RegisterHotkeys(showErrors: true);
         _toolbar.ApplyScale();
         _toolbar.Rebuild();
@@ -162,11 +171,11 @@ public sealed class AppController
             string folder = string.IsNullOrWhiteSpace(_settings.FullFolder)
                 ? AppSettings.DefaultFullFolder() : _settings.FullFolder;
             string path = ScreenCapture.SavePng(bmp, folder, "Screen");
-            Balloon("Скриншот сохранён", path);
+            Balloon(Loc.T("n.saved"), path);
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Не удалось сделать скриншот: " + ex.Message, "SSS Pen");
+            MessageBox.Show(Loc.T("err.shot") + " " + ex.Message, "SSS Pen");
         }
         finally
         {
@@ -198,7 +207,7 @@ public sealed class AppController
         catch (Exception ex)
         {
             if (tb) { _toolbar.Show(); _toolbar.Raise(); }
-            MessageBox.Show("Не удалось сделать скриншот: " + ex.Message, "SSS Pen");
+            MessageBox.Show(Loc.T("err.shot") + " " + ex.Message, "SSS Pen");
             return;
         }
 
@@ -217,22 +226,26 @@ public sealed class AppController
 
     // ---------- трей ----------
 
-    private void CreateTray()
+    private System.Windows.Forms.ContextMenuStrip BuildTrayMenu()
     {
         var menu = new System.Windows.Forms.ContextMenuStrip();
-        menu.Items.Add("Показать / скрыть панель", null, (_, _) => ToggleToolbar());
-        menu.Items.Add("Скриншот всего экрана", null, (_, _) => _ = CaptureFullAsync());
-        menu.Items.Add("Скриншот области", null, (_, _) => _ = CaptureRegionAsync());
-        menu.Items.Add("Очистить рисунки", null, (_, _) => _overlay.Clear());
-        menu.Items.Add("Настройки", null, (_, _) => OpenSettings());
-        menu.Items.Add("Выход", null, (_, _) => Exit());
+        menu.Items.Add(Loc.T("tray.toggle"), null, (_, _) => ToggleToolbar());
+        menu.Items.Add(Loc.T("tray.full"), null, (_, _) => _ = CaptureFullAsync());
+        menu.Items.Add(Loc.T("tray.region"), null, (_, _) => _ = CaptureRegionAsync());
+        menu.Items.Add(Loc.T("tray.clear"), null, (_, _) => _overlay.Clear());
+        menu.Items.Add(Loc.T("tray.settings"), null, (_, _) => OpenSettings());
+        menu.Items.Add(Loc.T("tray.exit"), null, (_, _) => Exit());
+        return menu;
+    }
 
+    private void CreateTray()
+    {
         _tray = new System.Windows.Forms.NotifyIcon
         {
             Icon = Icons.CreateTrayIcon(),
             Text = "SSS Pen",
             Visible = true,
-            ContextMenuStrip = menu,
+            ContextMenuStrip = BuildTrayMenu(),
         };
 
         // левый клик по иконке — открыть/скрыть панель
