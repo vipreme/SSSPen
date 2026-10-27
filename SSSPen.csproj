@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>SSSPen</AssemblyName>
+    <RootNamespace>SSSPen</RootNamespace>
+    <Product>SSS Pen</Product>
+    <Title>SSS Pen</Title>
+    <ApplicationIcon>spen.ico</ApplicationIcon>
+  </PropertyGroup>
+
+</Project>
