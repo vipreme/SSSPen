@@ -32,7 +32,7 @@ public sealed class AppController
             hide: ToggleToolbar);
         _toolbar.Show();
 
-        _overlay.StateChanged += () =>
+        _overlay.DrawStateChanged += () =>
         {
             _toolbar.Refresh();
             _toolbar.Raise();

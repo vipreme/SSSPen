@@ -26,7 +26,7 @@ public sealed class OverlayWindow : Window
 
     public bool IsDrawing => _drawMode;
     public Tool CurrentTool => _tool;
-    public event Action? StateChanged;
+    public event Action? DrawStateChanged;
 
     public OverlayWindow(AppSettings settings)
     {
@@ -98,7 +98,7 @@ public sealed class OverlayWindow : Window
         }
         _surface.Cursor = on ? (_tool == Tool.Eraser ? Cursors.Hand : Cursors.Cross) : null;
         ApplyStyle();
-        StateChanged?.Invoke();
+        DrawStateChanged?.Invoke();
     }
 
     public void Undo()

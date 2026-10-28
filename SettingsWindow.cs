@@ -162,7 +162,7 @@ public sealed class SettingsWindow : Window
 
     private static TextBox FolderRow(StackPanel parent, string label, string value)
     {
-        parent.Children.Add(new TextBlock { Text = Loc.T("hk." + key), Margin = new Thickness(0, 6, 0, 2) });
+        parent.Children.Add(new TextBlock { Text = label, Margin = new Thickness(0, 6, 0, 2) });
 
         var dock = new DockPanel();
         var btn = new Button { Content = Loc.T("s.browse"), Padding = new Thickness(8, 2, 8, 2), Margin = new Thickness(6, 0, 0, 0) };
